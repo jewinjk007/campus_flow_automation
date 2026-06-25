@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { tokens } from '../components/Navbar';
+import { Megaphone, Send, CheckCircle, AlertCircle, FileText, Calendar, Phone } from 'lucide-react';
 
-// Notice Summarizer — pastes a notice, gets AI bullets, broadcasts via WhatsApp
-export default function Summarize() {
+export default function Summarize({ dark }) {
+  const t = dark ? tokens.dark : tokens.light;
   const [noticeText, setNoticeText] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [phoneList, setPhoneList] = useState('');
@@ -10,131 +12,113 @@ export default function Summarize() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
 
+  const inputStyle = {
+    width: '100%', border: `1px solid ${t.border}`, borderRadius: '10px',
+    padding: '11px 14px', marginBottom: '16px', backgroundColor: t.inputBg,
+    color: t.text, fontSize: '14px', boxSizing: 'border-box',
+    outline: 'none', fontFamily: 'Inter, sans-serif',
+  };
+
   const handleSummarize = async () => {
-    // Validate that all fields are filled before proceeding
-    if (!noticeText.trim() || !eventDate || !phoneList.trim()) {
-      setError('Please fill in all fields before submitting.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setSent(false);
-    setBullets([]);
-
+    if (!noticeText.trim() || !eventDate || !phoneList.trim()) { setError('Please fill in all fields.'); return; }
+    setLoading(true); setError(''); setSent(false); setBullets([]);
     try {
-      // Step 1: Call backend to get AI-generated summary bullets
-      const summaryRes = await fetch(`http://localhost:5000/ai/summarize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const summaryRes = await fetch('http://localhost:5000/ai/summarize', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ noticeText }),
       });
-
       if (!summaryRes.ok) throw new Error('Summarization failed');
       const { bulletPoints } = await summaryRes.json();
       setBullets(bulletPoints);
-
-      // Step 2: Send notice details to n8n broadcast webhook via backend
-      const broadcastRes = await fetch(`http://localhost:5000/notify/broadcast`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          noticeText,
-          eventDate,
-          phoneList: phoneList.split(',').map(p => p.trim()),
-          bulletPoints,
-        }),
+      const broadcastRes = await fetch('http://localhost:5000/notify/broadcast', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ noticeText, eventDate, phoneList: phoneList.split(',').map(p => p.trim()), bulletPoints }),
       });
-
       if (!broadcastRes.ok) throw new Error('Broadcast failed');
       setSent(true);
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError(err.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
-          📢 Notice Summarizer
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-6">
-          Paste a campus notice — AI will generate a 3-bullet TL;DR and broadcast it via WhatsApp.
+    <div style={{ minHeight: '100vh', backgroundColor: t.bg, padding: '32px' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Megaphone size={20} color="#fff" />
+          </div>
+          <h1 style={{ fontSize: '26px', fontWeight: '800', color: t.text, letterSpacing: '-0.5px' }}>Notice Summarizer</h1>
+        </div>
+        <p style={{ color: t.muted, fontSize: '14px', marginBottom: '28px', marginLeft: '52px' }}>
+          Paste a campus notice — AI generates a 3-bullet TL;DR and broadcasts it via WhatsApp.
         </p>
 
-        {/* Notice text input */}
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Notice Text
-        </label>
-        <textarea
-          rows={6}
-          value={noticeText}
-          onChange={e => setNoticeText(e.target.value)}
-          placeholder="Paste the full notice here..."
-          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 mb-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+        <div style={{ backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '24px', boxShadow: dark ? 'none' : '0 1px 4px rgba(99,102,241,0.06)' }}>
 
-        {/* Event date input */}
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Event Date
-        </label>
-        <input
-          type="date"
-          value={eventDate}
-          onChange={e => setEventDate(e.target.value)}
-          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 mb-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+          <label style={{ fontSize: '13px', fontWeight: '600', color: t.text, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+            <FileText size={13} color={tokens.primary} /> Notice Text
+          </label>
+          <textarea rows={6} value={noticeText} onChange={e => setNoticeText(e.target.value)} placeholder="Paste the full campus notice here..." style={{ ...inputStyle, resize: 'vertical' }} />
 
-        {/* Phone numbers — comma separated */}
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Phone Numbers (comma-separated, with country code)
-        </label>
-        <input
-          type="text"
-          value={phoneList}
-          onChange={e => setPhoneList(e.target.value)}
-          placeholder="+919876543210, +919123456789"
-          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 mb-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: '600', color: t.text, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <Calendar size={13} color={tokens.primary} /> Event Date
+              </label>
+              <input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} style={inputStyle} />
+            </div>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: '600', color: t.text, display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                <Phone size={13} color={tokens.primary} /> Phone Numbers
+              </label>
+              <input type="text" value={phoneList} onChange={e => setPhoneList(e.target.value)} placeholder="+919876543210, +919123456789" style={inputStyle} />
+            </div>
+          </div>
 
-        {/* Error message display */}
-        {error && (
-          <p className="text-red-500 text-sm mb-3">{error}</p>
-        )}
+          {error && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: tokens.error, fontSize: '13px', marginBottom: '12px' }}>
+              <AlertCircle size={14} /> {error}
+            </div>
+          )}
 
-        {/* Main action button */}
-        <button
-          onClick={handleSummarize}
-          disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold py-3 rounded-lg transition-colors"
-        >
-          {loading ? '⏳ Processing...' : '✨ Summarize & Broadcast'}
-        </button>
+          <button onClick={handleSummarize} disabled={loading} style={{
+            width: '100%', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+            color: '#fff', border: 'none', borderRadius: '10px',
+            padding: '13px', fontWeight: '700', fontSize: '15px',
+            cursor: 'pointer', opacity: loading ? 0.7 : 1,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
+          }}>
+            <Send size={16} />
+            {loading ? 'Processing...' : 'Summarize & Broadcast'}
+          </button>
+        </div>
 
-        {/* AI bullet points result */}
+        {/* AI bullet results */}
         {bullets.length > 0 && (
-          <div className="mt-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-              📋 AI Summary
+          <div style={{ marginTop: '20px', backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '24px', boxShadow: dark ? 'none' : '0 1px 4px rgba(99,102,241,0.06)' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: '700', color: t.text, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FileText size={15} color={tokens.primary} /> AI Summary
             </h2>
-            <ul className="space-y-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {bullets.map((point, i) => (
-                <li key={i} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
-                  <span className="text-indigo-500 font-bold mt-0.5">•</span>
-                  {point}
-                </li>
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '12px', backgroundColor: t.planBg, borderRadius: '10px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: '800', color: tokens.primary, minWidth: '20px', marginTop: '1px' }}>0{i + 1}</span>
+                  <p style={{ fontSize: '14px', color: t.text, lineHeight: '1.5' }}>{point}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
 
-        {/* Success message after broadcast */}
+        {/* Success message */}
         {sent && (
-          <div className="mt-4 bg-green-50 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded-lg p-4 text-green-700 dark:text-green-300 font-medium">
-            ✅ Broadcast sent! WhatsApp messages are on their way and the Calendar event has been created.
+          <div style={{ marginTop: '16px', backgroundColor: dark ? '#052e16' : '#F0FDF4', border: `1px solid ${dark ? '#166534' : '#86EFAC'}`, borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '10px', color: dark ? '#86efac' : '#065F46', fontWeight: '600', fontSize: '14px' }}>
+            <CheckCircle size={18} /> Broadcast sent! WhatsApp messages are on their way and the Calendar event has been created.
           </div>
         )}
       </div>
