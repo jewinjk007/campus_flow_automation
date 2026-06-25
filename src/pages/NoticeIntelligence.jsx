@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { tokens } from '../components/Navbar';
+import { tokens } from './components/layout/Navbar';
 import { Megaphone, Send, CheckCircle, AlertCircle, FileText, Calendar, Phone } from 'lucide-react';
 
 export default function Summarize({ dark }) {
+  const API_BASE = import.meta.env.VITE_API_BASE || '/api';
   const t = dark ? tokens.dark : tokens.light;
   const [noticeText, setNoticeText] = useState('');
   const [eventDate, setEventDate] = useState('');
@@ -23,14 +24,14 @@ export default function Summarize({ dark }) {
     if (!noticeText.trim() || !eventDate || !phoneList.trim()) { setError('Please fill in all fields.'); return; }
     setLoading(true); setError(''); setSent(false); setBullets([]);
     try {
-      const summaryRes = await fetch('http://localhost:5000/ai/summarize', {
+      const summaryRes = await fetch(`${API_BASE}/ai/summarize`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ noticeText }),
       });
       if (!summaryRes.ok) throw new Error('Summarization failed');
       const { bulletPoints } = await summaryRes.json();
       setBullets(bulletPoints);
-      const broadcastRes = await fetch('http://localhost:5000/notify/broadcast', {
+      const broadcastRes = await fetch(`${API_BASE}/notice/broadcast`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ noticeText, eventDate, phoneList: phoneList.split(',').map(p => p.trim()), bulletPoints }),
       });

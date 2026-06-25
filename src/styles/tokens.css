@@ -1,0 +1,53 @@
+:root {
+  /* Color */
+  --color-bg: #F1ECE2;
+  --color-bg-raised: #FDFCFA;
+  --color-border: #E0D9CC;
+  --color-border-strong: #C9C4BA;
+
+  --color-text-primary: #211E1A;
+  --color-text-secondary: #5C564D;
+  --color-text-tertiary: #7C766C;
+
+  --color-primary: #BC6B45;
+  --color-primary-hover: #A35636;
+  --color-secondary: #7C9461;
+
+  --color-success: #5B8C5A;
+  --color-success-bg: #EEF5EC;
+  --color-warning: #C28A2E;
+  --color-warning-bg: #FAF1E2;
+  --color-danger: #B5523F;
+  --color-danger-bg: #F8EBE9;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Typography */
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 26px;
+  --text-2xl: 34px;
+
+  /* Shadow — used sparingly, borders preferred */
+  --shadow-subtle: 0 1px 2px 0 rgba(33, 30, 26, 0.04);
+}

@@ -4,21 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import { Input } from "../components/ui/Input";
 import Button from "../components/ui/Button";
 
-export default function Register() {
-  const [form, setForm] = useState({
-    name: "",
-    branch: "",
-    year: "",
-    phone: "",
-    email: "",
-    password: "",
-  });
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  const update = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,15 +18,15 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/register", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Registration failed");
+        throw new Error(data.error || "Login failed");
       }
 
       login(data.student);
@@ -53,7 +45,7 @@ export default function Register() {
           CampusFlow
         </h1>
         <p className="text-sm text-ink-400 text-center mb-8">
-          Create your account — one hub for everything academic.
+          Sign in to your student hub.
         </p>
 
         <form
@@ -61,62 +53,31 @@ export default function Register() {
           className="bg-cream-50 border border-ink-100 rounded-lg p-6 space-y-4 shadow-subtle"
         >
           <Input
-            label="Full name"
-            placeholder="Your name"
-            value={form.name}
-            onChange={update("name")}
-            required
-          />
-          <Input
             label="College email"
             type="email"
             placeholder="you@college.edu"
-            value={form.email}
-            onChange={update("email")}
-            required
-          />
-          <Input
-            label="Branch"
-            placeholder="Computer Science"
-            value={form.branch}
-            onChange={update("branch")}
-            required
-          />
-          <Input
-            label="Year"
-            type="number"
-            placeholder="2"
-            value={form.year}
-            onChange={update("year")}
-            min={1}
-            max={4}
-            required
-          />
-          <Input
-            label="Phone"
-            placeholder="+919876543210"
-            value={form.phone}
-            onChange={update("phone")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
           <Input
             label="Password"
             type="password"
-            placeholder="Create a password"
-            value={form.password}
-            onChange={update("password")}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <Button type="submit" className="w-full" size="md" loading={loading}>
-            {loading ? "Creating account..." : "Create account"}
+          <Button type="submit" className="w-full" size="md" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in"}
           </Button>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </form>
 
         <p className="text-sm text-ink-400 text-center mt-5">
-          Already have an account?{" "}
-          <Link to="/login" className="text-clay-600 hover:underline">
-            Sign in
+          New to CampusFlow?{" "}
+          <Link to="/register" className="text-clay-600 hover:underline">
+            Create an account
           </Link>
         </p>
       </div>

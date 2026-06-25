@@ -1,130 +1,245 @@
-import { useState } from 'react';
-import { tokens } from '../components/Navbar';
-import { CalendarDays, Plus, BookOpen, CheckCircle, Circle } from 'lucide-react';
+import { useEffect, useState } from "react";
+import PageContainer from "../components/layout/PageContainer";
+import Tabs from "../components/ui/Tabs";
+import Card from "../components/ui/Card";
+import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Plus } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
-export default function Tasks({ dark }) {
-  const t = dark ? tokens.dark : tokens.light;
-  const [subject, setSubject] = useState('');
-  const [deadline, setDeadline] = useState('');
+function formatDue(deadline) {
+  const date = new Date(deadline);
+  if (Number.isNaN(date.getTime())) return "No deadline";
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function priorityForDeadline(deadline) {
+  const dueDate = new Date(deadline);
+  if (Number.isNaN(dueDate.getTime())) return "low";
+  const days = Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24));
+  if (days <= 1) return "high";
+  if (days <= 3) return "medium";
+  return "low";
+}
+
+const COLUMNS = [
+  { key: "todo", label: "To Do" },
+  { key: "in-progress", label: "In Progress" },
+  { key: "done", label: "Done" },
+];
+
+const PRIORITY_TONE = { high: "danger", medium: "warning", low: "neutral" };
+
+function TaskCard({ task }) {
+  return (
+    <Card padding="sm" className="mb-3">
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-sm font-medium text-ink-800">{task.title}</p>
+        <Badge tone={PRIORITY_TONE[task.priority]}>{task.priority}</Badge>
+      </div>
+      <p className="text-xs text-ink-400">{task.due}</p>
+    </Card>
+  );
+}
+
+function KanbanView({ tasks }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {COLUMNS.map((col) => (
+        <div key={col.key}>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-400 mb-3">
+            {col.label} · {tasks.filter((t) => t.status === col.key).length}
+          </h3>
+          {tasks
+            .filter((t) => t.status === col.key)
+            .map((t) => (
+              <TaskCard key={t.id} task={t} />
+            ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ListView({ tasks }) {
+  return (
+    <div className="space-y-2">
+      {tasks.map((t) => (
+        <Card key={t.id} padding="sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-ink-800">{t.title}</p>
+              <p className="text-xs text-ink-400">{t.due}</p>
+            </div>
+            <Badge tone={PRIORITY_TONE[t.priority]}>{t.priority}</Badge>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function TimelineView({ tasks }) {
+  return (
+    <div className="relative pl-4 border-l border-ink-100 space-y-5">
+      {tasks.map((t) => (
+        <div key={t.id} className="relative">
+          <span className="absolute -left-[21px] top-1 w-2 h-2 rounded-full bg-clay-500" />
+          <p className="text-xs text-ink-400">{t.due}</p>
+          <p className="text-sm text-ink-800 font-medium">{t.title}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function Tasks() {
+  const [view, setView] = useState("kanban");
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [tasks, setTasks] = useState([
-    { id: 1, subject: 'Data Structures Assignment', deadline: '2025-07-15', studyPlan: ['Revise arrays and linked lists', 'Practice trees and graphs', 'Mock problems + submission'], status: 'active' },
-    { id: 2, subject: 'Physics Lab Report', deadline: '2025-07-10', studyPlan: ['Complete observations', 'Write analysis section', 'Proofread and submit'], status: 'active' },
-    { id: 3, subject: 'Chemistry Project', deadline: '2025-07-08', studyPlan: ['Research topic', 'Prepare slides', 'Final review'], status: 'done' },
-  ]);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ title: "", subject: "", deadline: "", add_to_calendar: true });
+  const [error, setError] = useState("");
+  const { student } = useAuth();
 
-  const inputStyle = {
-    width: '100%', border: `1px solid ${t.border}`, borderRadius: '10px',
-    padding: '11px 14px', marginBottom: '16px', backgroundColor: t.inputBg,
-    color: t.text, fontSize: '14px', boxSizing: 'border-box',
-    outline: 'none', fontFamily: 'Inter, sans-serif',
+  useEffect(() => {
+    async function loadTasks() {
+      if (!student) return;
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/tasks?student_id=${student.id}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Could not load tasks");
+        setTasks(data.tasks || []);
+      } catch (err) {
+        console.warn(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTasks();
+  }, [student]);
+
+  const updateForm = (key) => (e) => {
+    const value = key === "add_to_calendar" ? e.target.checked : e.target.value;
+    setForm({ ...form, [key]: value });
   };
 
-  const handleAddTask = async () => {
-    if (!subject.trim() || !deadline) { setError('Please enter both subject and deadline.'); return; }
-    setLoading(true); setError('');
+  const handleAddTask = async (e) => {
+    e.preventDefault();
+    if (!student) {
+      setError("Please log in first.");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
     try {
-      const res = await fetch('http://localhost:5000/ai/studyplan', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, deadline }),
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, student_id: student.id }),
       });
-      if (!res.ok) throw new Error('Failed');
-      const { studyPlan } = await res.json();
-      setTasks(prev => [{ id: Date.now(), subject, deadline, studyPlan, status: 'active' }, ...prev]);
-    } catch {
-      setTasks(prev => [{ id: Date.now(), subject, deadline, studyPlan: ['Start early and review notes', 'Practice problems', 'Final revision before deadline'], status: 'active' }, ...prev]);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not add task");
+
+      setTasks((prev) => [...prev, data.task]);
+      setForm({ title: "", subject: "", deadline: "", add_to_calendar: true });
+      setShowForm(false);
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setLoading(false); setSubject(''); setDeadline('');
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: t.bg, padding: '32px' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <PageContainer
+      title="Tasks & Deadlines"
+      subtitle="Every assignment, synced to your calendar and reminders."
+      actions={
+        <Button icon={Plus} size="sm" onClick={() => setShowForm((prev) => !prev)}>
+          {showForm ? "Cancel" : "Add task"}
+        </Button>
+      }
+    >
+      {showForm && (
+        <Card padding="md" className="mb-5">
+          <form onSubmit={handleAddTask} className="space-y-4">
+            <Input
+              label="Title"
+              placeholder="Submit DBMS assignment"
+              value={form.title}
+              onChange={updateForm("title")}
+              required
+            />
+            <Input
+              label="Subject"
+              placeholder="Database Systems"
+              value={form.subject}
+              onChange={updateForm("subject")}
+              required
+            />
+            <Input
+              label="Deadline"
+              type="date"
+              value={form.deadline}
+              onChange={updateForm("deadline")}
+              required
+            />
+            <label className="flex items-center gap-2 text-sm text-ink-600">
+              <input
+                type="checkbox"
+                checked={form.add_to_calendar}
+                onChange={updateForm("add_to_calendar")}
+              />
+              Add to calendar reminders
+            </label>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <Button type="submit" className="w-full" size="md" disabled={loading}>
+              {loading ? "Saving..." : "Save task"}
+            </Button>
+          </form>
+        </Card>
+      )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <CalendarDays size={20} color="#fff" />
-          </div>
-          <h1 style={{ fontSize: '26px', fontWeight: '800', color: t.text, letterSpacing: '-0.5px' }}>Smart Deadline Manager</h1>
-        </div>
-        <p style={{ color: t.muted, fontSize: '14px', marginBottom: '28px', marginLeft: '52px' }}>
-          Add a deadline — AI will generate a day-by-day study plan and send reminders.
-        </p>
-
-        {/* Add task form */}
-        <div style={{ backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '24px', marginBottom: '28px', boxShadow: dark ? 'none' : '0 1px 4px rgba(99,102,241,0.06)' }}>
-          <h2 style={{ fontSize: '15px', fontWeight: '700', color: t.text, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Plus size={16} color={tokens.primary} /> Add New Deadline
-          </h2>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: '600', color: t.text, display: 'block', marginBottom: '6px' }}>Subject / Task Name</label>
-              <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="e.g. Data Structures Assignment" style={inputStyle} />
-            </div>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: '600', color: t.text, display: 'block', marginBottom: '6px' }}>Deadline Date</label>
-              <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} style={inputStyle} />
-            </div>
-          </div>
-
-          {error && <p style={{ color: tokens.error, fontSize: '13px', marginBottom: '12px' }}>{error}</p>}
-
-          <button onClick={handleAddTask} disabled={loading} style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-            color: '#fff', border: 'none', borderRadius: '10px',
-            padding: '11px 24px', fontWeight: '700', fontSize: '14px',
-            cursor: 'pointer', opacity: loading ? 0.7 : 1,
-            fontFamily: 'Inter, sans-serif',
-            boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
-          }}>
-            <Plus size={16} />
-            {loading ? 'Generating study plan...' : 'Add Deadline & Generate Plan'}
-          </button>
-        </div>
-
-        {/* Tasks list */}
-        <h2 style={{ fontSize: '15px', fontWeight: '700', color: t.text, marginBottom: '16px' }}>Your Deadlines</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {tasks.map(task => (
-            <div key={task.id} style={{ backgroundColor: t.surface, border: `1px solid ${t.border}`, borderRadius: '16px', padding: '20px', boxShadow: dark ? 'none' : '0 1px 4px rgba(99,102,241,0.06)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {task.status === 'done'
-                    ? <CheckCircle size={18} color={tokens.success} />
-                    : <Circle size={18} color={tokens.primary} />}
-                  <h3 style={{ fontWeight: '700', color: t.text, fontSize: '15px' }}>{task.subject}</h3>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '12px', color: t.muted, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <CalendarDays size={12} /> {task.deadline}
-                  </span>
-                  <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '999px', backgroundColor: task.status === 'done' ? '#D1FAE5' : '#EEF2FF', color: task.status === 'done' ? '#065F46' : tokens.primary }}>
-                    {task.status === 'done' ? 'Done' : 'Active'}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ backgroundColor: t.planBg, borderRadius: '10px', padding: '14px' }}>
-                <p style={{ fontSize: '11px', fontWeight: '700', color: tokens.primary, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <BookOpen size={12} /> AI Study Plan
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {task.studyPlan.map((step, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '700', color: tokens.primary, minWidth: '20px' }}>D{i + 1}</span>
-                      <p style={{ fontSize: '13px', color: t.text }}>{step}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="mb-5">
+        <Tabs
+          tabs={[
+            { value: "kanban", label: "Kanban" },
+            { value: "list", label: "List" },
+            { value: "timeline", label: "Timeline" },
+          ]}
+          active={view}
+          onChange={setView}
+        />
       </div>
-    </div>
+
+      {view === "kanban" && <KanbanView tasks={tasks.map((task) => ({
+        ...task,
+        status: "todo",
+        priority: priorityForDeadline(task.deadline),
+        due: formatDue(task.deadline),
+      }))} />}
+      {view === "list" && <ListView tasks={tasks.map((task) => ({
+        ...task,
+        status: "todo",
+        priority: priorityForDeadline(task.deadline),
+        due: formatDue(task.deadline),
+      }))} />}
+      {view === "timeline" && <TimelineView tasks={tasks.map((task) => ({
+        ...task,
+        status: "todo",
+        priority: priorityForDeadline(task.deadline),
+        due: formatDue(task.deadline),
+      }))} />}
+    </PageContainer>
   );
 }

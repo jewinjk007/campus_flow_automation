@@ -6,9 +6,11 @@ const errorHandler = require('./middleware/errorHandler');
 
 // Route modules
 const registerRoutes = require('./routes/register');
+const authRoutes     = require('./routes/auth');
 const tasksRoutes    = require('./routes/tasks');
 const aiRoutes       = require('./routes/ai');
 const noticeRoutes   = require('./routes/notice');
+const attendanceRoutes = require('./routes/attendance');
 
 const app  = express();
 const PORT = process.env.PORT || 5000;
@@ -30,7 +32,9 @@ app.get('/health', (req, res) => {
 // Routes
 // ----------------------------------------------------------------
 app.use('/register', registerRoutes);   // POST /register, GET /register/:id
+app.use('/auth',     authRoutes);       // GET /auth?email=xxx
 app.use('/tasks',    tasksRoutes);      // POST /tasks, GET /tasks, DELETE /tasks/:id
+app.use('/attendance', attendanceRoutes); // GET /attendance?student_id=xxx
 app.use('/ai',       aiRoutes);         // POST /ai/summarize, POST /ai/studyplan
 app.use('/notice',   noticeRoutes);     // POST /notice/broadcast
 
@@ -45,6 +49,8 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`CampusFlow backend running on http://localhost:${PORT}`);
   console.log(`  POST /register`);
+  console.log(`  GET  /auth?email=xxx`);
+  console.log(`  POST /auth/login`);
   console.log(`  POST /tasks  |  GET /tasks?student_id=xxx`);
   console.log(`  POST /ai/summarize`);
   console.log(`  POST /ai/studyplan`);
