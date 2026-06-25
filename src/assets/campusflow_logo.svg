@@ -1,0 +1,43 @@
+<svg width="100%" viewBox="0 0 680 340" role="img" style="" xmlns="http://www.w3.org/2000/svg">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">CampusFlow logo</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">CampusFlow app logo — a graduation cap with a flowing arrow, beside the wordmark</desc>
+
+  
+
+  
+  <rect x="60" y="80" width="160" height="160" rx="32" style="fill:rgb(29, 158, 117);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  
+  <polygon points="140,108 200,133 140,158 80,133" fill="#04342C" opacity="0.95" style="fill:rgb(4, 52, 44);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.95;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  
+  <polygon points="140,108 200,133 140,144 80,133" fill="#085041" opacity="0.7" style="fill:rgb(8, 80, 65);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.7;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  
+  <rect x="118" y="147" width="44" height="20" rx="4" fill="#04342C" opacity="0.85" style="fill:rgb(4, 52, 44);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.85;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  
+  <line x1="200" y1="133" x2="200" y2="175" stroke="#E1F5EE" stroke-width="3" stroke-linecap="round" style="fill:rgb(0, 0, 0);stroke:rgb(225, 245, 238);color:rgb(0, 0, 0);stroke-width:3px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  
+  <circle cx="200" cy="180" r="7" fill="#9FE1CB" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  
+  <circle cx="200" cy="133" r="5" fill="#9FE1CB" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  
+  
+  <path d="M140 210 Q140 232 162 238 Q185 244 200 238 Q220 230 220 215" fill="none" stroke="#FAC775" stroke-width="5" stroke-linecap="round" style="fill:none;stroke:rgb(250, 199, 117);color:rgb(0, 0, 0);stroke-width:5px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  
+  <polyline points="212,228 220,215 228,228" fill="none" stroke="#FAC775" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" style="fill:none;stroke:rgb(250, 199, 117);color:rgb(0, 0, 0);stroke-width:5px;stroke-linecap:round;stroke-linejoin:round;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  
+  
+  <text x="252" y="158" font-family="var(--font-sans, sans-serif)" font-size="54" font-weight="600" letter-spacing="-1" style="fill:rgb(232, 230, 222);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:54px;font-weight:600;text-anchor:start;dominant-baseline:auto">Campus</text>
+
+  
+  <text x="252" y="215" font-family="var(--font-sans, sans-serif)" font-size="54" font-weight="600" letter-spacing="-1" style="fill:rgb(250, 199, 117);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:54px;font-weight:600;text-anchor:start;dominant-baseline:auto">Flow</text>
+
+  
+  <text x="254" y="244" font-family="var(--font-sans, sans-serif)" font-size="15" font-weight="400" letter-spacing="2" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:15px;font-weight:400;text-anchor:start;dominant-baseline:auto">AUTOMATE YOUR CAMPUS LIFE</text>
+
+  
+  <line x1="236" y1="100" x2="236" y2="230" stroke="#1D9E75" stroke-width="1.5" opacity="0.4" style="fill:rgb(0, 0, 0);stroke:rgb(29, 158, 117);color:rgb(0, 0, 0);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.4;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+</svg>

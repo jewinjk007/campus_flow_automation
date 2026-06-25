@@ -34,8 +34,8 @@ export default function Navbar() {
 
   return (
     <nav style={navStyle}>
-      <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#6366f1' }}>
-        🎓 CampusFlow
+      <span>
+        <img src="./src/assets/campusflow_logo.svg" alt="Logo" style={{ height: '50px', marginRight: '10px' }} />
       </span>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
