@@ -10,6 +10,7 @@ const authRoutes     = require('./routes/auth');
 const tasksRoutes    = require('./routes/tasks');
 const aiRoutes       = require('./routes/ai');
 const noticeRoutes   = require('./routes/notice');
+const n8nRoutes      = require('./routes/n8n');
 const attendanceRoutes = require('./routes/attendance');
 
 const app  = express();
@@ -37,6 +38,7 @@ app.use('/tasks',    tasksRoutes);      // POST /tasks, GET /tasks, DELETE /task
 app.use('/attendance', attendanceRoutes); // GET /attendance?student_id=xxx
 app.use('/ai',       aiRoutes);         // POST /ai/summarize, POST /ai/studyplan
 app.use('/notice',   noticeRoutes);     // POST /notice/broadcast
+app.use('/n8n',      n8nRoutes);        // GET /n8n/status
 
 // ----------------------------------------------------------------
 // Global error handler (must be last)

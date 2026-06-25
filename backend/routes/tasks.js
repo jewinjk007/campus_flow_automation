@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const supabase = require('../config/supabase');
+const { sendDeadlineReminder } = require('../webhooks/n8n');
 
 // ----------------------------------------------------------------
 // POST /tasks
@@ -63,7 +64,7 @@ router.post('/', async (req, res, next) => {
 
     // --- POST to n8n Deadline Reminder webhook ---
     try {
-      await axios.post(process.env.N8N_DEADLINE_WEBHOOK, {
+      await sendDeadlineReminder(process.env.N8N_DEADLINE_WEBHOOK, {
         taskId:         task.id,
         title,
         subject,

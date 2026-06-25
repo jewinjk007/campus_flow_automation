@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { sendNoticeBroadcast } = require('../webhooks/n8n');
 
 // ----------------------------------------------------------------
 // POST /notice/broadcast
@@ -35,7 +36,7 @@ router.post('/broadcast', async (req, res, next) => {
     }
 
     // Fire n8n Workflow 2 webhook
-    await axios.post(process.env.N8N_NOTICE_WEBHOOK, {
+    await sendNoticeBroadcast(process.env.N8N_NOTICE_WEBHOOK, {
       noticeText,
       summary,
       bulletPoints,
@@ -47,7 +48,7 @@ router.post('/broadcast', async (req, res, next) => {
     return res.json({ status: 'broadcast triggered', recipients: phoneList.length });
   } catch (err) {
     // Specifically handle n8n being unreachable
-    if (err.code === 'ECONNREFUSED' || err.response?.status >= 500) {
+    if (err.isN8nUnreachable) {
       return res.status(502).json({ error: 'n8n webhook unreachable. Is the workflow active?' });
     }
     next(err);
