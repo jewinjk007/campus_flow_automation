@@ -7,18 +7,28 @@ import Summarize from './pages/Summarize';
 import Automations from './pages/Automations';
 
 function App() {
+  // Dark mode state lives here so the whole page can react to it
+  const [dark, setDark] = useState(false);
+
   return (
     <BrowserRouter>
-      {/* Navbar appears on every page */}
-      <Navbar />
-      <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/tasks" element={<Tasks />} />
-        <Route path="/summarize" element={<Summarize />} />
-        <Route path="/automations" element={<Automations />} />
-        <Route path="/" element={<Dashboard />} />
-      </Routes>
+      {/* This wrapper div controls the background of the entire page */}
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: dark ? '#111827' : '#f9fafb',
+        color: dark ? '#f3f4f6' : '#111827',
+        transition: 'background-color 0.3s ease',
+      }}>
+        <Navbar dark={dark} setDark={setDark} />
+        <Routes>
+          <Route path="/register" element={<Register dark={dark} />} />
+          <Route path="/dashboard" element={<Dashboard dark={dark} />} />
+          <Route path="/tasks" element={<Tasks dark={dark} />} />
+          <Route path="/summarize" element={<Summarize dark={dark} />} />
+          <Route path="/automations" element={<Automations dark={dark} />} />
+          <Route path="/" element={<Dashboard dark={dark} />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
